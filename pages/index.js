@@ -1,11 +1,147 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import Head from "next/head";
+import React, { useState, useEffect } from "react";
+import TopNav from "@/components/TopNav";
+import SideNav from "@/components/SideNav";
+import BannerCarousel from "@/components/BannerCarousel";
+import LandingMainContent from "@/components/LandingMainContent";
+import ReferAFriend from "@/components/ReferAFriend";
+import BetSlip from "@/components/BetSlip";
 
 export default function Home() {
+  const [isPopularExpanded, setIsPopularExpanded] = useState(true);
+  const togglePopularExpanded = () => {
+    setIsPopularExpanded(!isPopularExpanded);
+  };
+  const [isAllSportsExpanded, setIsAllSportsExpanded] = useState(true);
+  const toggleAllSportsExpanded = () => {
+    setIsAllSportsExpanded(!isAllSportsExpanded);
+  };
+
+  const [sportToQuery, setSportToQuery] = useState("baseball_mlb");
+  const [isFuturesURL, setIsFuturesURL] = useState(false);
+  const handleSportToQuery = (sport) => {
+    if (
+      sport.includes("World Series") ||
+      sport.includes("Champ") ||
+      sport.includes("super")
+    ) {
+      setIsFuturesURL(true);
+    } else {
+      setIsFuturesURL(false);
+    }
+    setSportToQuery(sport);
+  };
+
+  const banners = [
+    "/banner1.jpg",
+    "/banner2.jpg",
+    "/banner3.jpg",
+    "/banner4.jpg",
+    "/banner5.jpg",
+    "/banner6.jpg",
+  ];
+  const [selectedBets, setSelectedBets] = useState([]);
+  const [isParlayValid, setIsParlayValid] = useState(true);
+
+  const handleMoneylineSelection = (team, odds, homeTeam, awayTeam) => {
+    const bet = {
+      type: "moneyline",
+      team,
+      odds,
+      homeTeam,
+      awayTeam,
+    };
+
+    // Check if the opposite moneyline is already in selectedBets
+    const oppositeMoneylineIndex = selectedBets.findIndex(
+      (b) =>
+        b.type === bet.type &&
+        b.team !== bet.team &&
+        b.homeTeam === bet.homeTeam &&
+        b.awayTeam === bet.awayTeam
+    );
+
+    // If the opposite moneyline is already in selectedBets, do nothing
+
+    const betIndex = selectedBets.findIndex(
+      (b) =>
+        b.type === bet.type &&
+        b.team === bet.team &&
+        b.homeTeam === bet.homeTeam &&
+        b.awayTeam === bet.awayTeam
+    );
+
+    if (betIndex === -1) {
+      setSelectedBets([...selectedBets, bet]);
+    } else {
+      const newSelectedBets = [...selectedBets];
+      newSelectedBets.splice(betIndex, 1);
+      setSelectedBets(newSelectedBets);
+    }
+
+    console.log(selectedBets);
+  };
+
+  const handleOverUnderSelection = (data) => {
+    const { outcome, homeTeam, awayTeam, index } = data;
+
+    const bet = {
+      type: "over_under",
+      outcome,
+      homeTeam,
+      awayTeam,
+    };
+
+    const betIndex = selectedBets.findIndex(
+      (b) =>
+        b.type === bet.type &&
+        b.outcome.name === bet.outcome.name &&
+        b.outcome.point === bet.outcome.point &&
+        b.homeTeam === bet.homeTeam &&
+        b.awayTeam === bet.awayTeam
+    );
+
+    if (betIndex === -1) {
+      setSelectedBets([...selectedBets, bet]);
+    } else {
+      const newSelectedBets = [...selectedBets];
+      newSelectedBets.splice(betIndex, 1);
+      setSelectedBets(newSelectedBets);
+    }
+
+    console.log(selectedBets);
+  };
+  const checkParlayValid = (bets) => {
+    const moneylineBets = bets.filter((bet) => bet.type === "moneyline");
+    const overUnderBets = bets.filter((bet) => bet.type === "over_under");
+
+    const gameCounts = {};
+
+    for (const bet of moneylineBets) {
+      const gameKey = `moneyline-${bet.homeTeam}-${bet.awayTeam}`;
+      gameCounts[gameKey] = (gameCounts[gameKey] || 0) + 1;
+
+      if (gameCounts[gameKey] > 1) {
+        return false;
+      }
+    }
+
+    for (const bet of overUnderBets) {
+      const gameKey = `overUnder-${bet.homeTeam}-${bet.awayTeam}`;
+      gameCounts[gameKey] = (gameCounts[gameKey] || 0) + 1;
+
+      if (gameCounts[gameKey] > 1) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  useEffect(() => {
+    setIsParlayValid(checkParlayValid(selectedBets));
+  }, [selectedBets]);
+
   return (
     <>
       <Head>
@@ -14,110 +150,35 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.js</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
+      <TopNav />
+      <div className="flex h-screen">
+        <SideNav
+          isPopularExpanded={isPopularExpanded}
+          togglePopularExpanded={togglePopularExpanded}
+          isAllSportsExpanded={isAllSportsExpanded}
+          toggleAllSportsExpanded={toggleAllSportsExpanded}
+          handleSportToQuery={handleSportToQuery}
+        />
+        {/* Main Content */}
+        <div className="flex-grow  bg-black">
+          {/* Insert promo banners here */}
+          <div className="bg-black h-1/4 p-1">
+            <BannerCarousel banners={banners} />
           </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
+          <ReferAFriend />
+          <div className=" ">
+            <LandingMainContent
+              sportToQuery={sportToQuery}
+              isFuturesURL={isFuturesURL}
+              handleMoneylineSelection={handleMoneylineSelection}
+              handleOverUnderSelection={handleOverUnderSelection}
             />
           </div>
         </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
+        <div className="bg-black w-1/4">
+          <BetSlip selectedBets={selectedBets} isParlayValid={isParlayValid} />
         </div>
-      </main>
+      </div>
     </>
-  )
+  );
 }
