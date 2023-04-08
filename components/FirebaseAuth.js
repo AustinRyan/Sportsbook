@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { auth } from "../firebase";
+import { auth } from ".././firebase";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
 import {

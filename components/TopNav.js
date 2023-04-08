@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { auth, db } from "../firebase";
+import { auth, db } from ".././firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 import { Link } from "next/link";

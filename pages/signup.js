@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { auth, db } from "../firebase";
+import { auth, db } from ".././firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, setDoc } from "firebase/firestore";
 import dynamic from "next/dynamic";
