@@ -4,7 +4,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { db } from "../firebase";
 import { collection, doc, getDoc } from "firebase/firestore";
 
-const SignIn = () => {
+export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -54,6 +54,4 @@ const SignIn = () => {
       </form>
     </div>
   );
-};
-
-export default SignIn;
+}

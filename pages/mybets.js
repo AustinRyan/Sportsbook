@@ -5,17 +5,17 @@ import { auth, db } from ".././firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
-const MyBets = () => {
+export default function MyBets() {
   const [activeBets, setActiveBets] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         setIsLoggedIn(true);
-        const userDoc = doc(db, "users", user.uid);
-        const userDocSnapshot = await getDoc(userDoc);
-        if (userDocSnapshot.exists()) {
+        const userDoc = db.collection("users").doc(user.uid);
+        const userDocSnapshot = await userDoc.get();
+        if (userDocSnapshot.exists) {
           const userData = userDocSnapshot.data();
           setActiveBets(userData.bets);
         }
@@ -46,5 +46,4 @@ const MyBets = () => {
       </div>
     </div>
   );
-};
-export default MyBets;
+}

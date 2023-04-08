@@ -1,30 +1,47 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { auth, db } from ".././firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { collection, doc, setDoc, getDoc } from "firebase/firestore";
-import { Link } from "next/link";
+import { auth, db } from "../firebase";
+import "firebase/auth";
+import "firebase/firestore";
+
+import Link from "next/link";
 const TopNav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [balance, setBalance] = useState(0);
+  const [displayName, setDisplayName] = useState("");
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+  const handleSignOut = async () => {
+    const confirmSignOut = window.confirm("Are you sure you want to sign out?");
+
+    if (confirmSignOut) {
+      try {
+        await auth.signOut();
+      } catch (error) {
+        console.error("Error signing out:", error);
+      }
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         setIsLoggedIn(true);
-        const userDoc = doc(db, "users", user.uid);
-        const userDocSnapshot = await getDoc(userDoc);
-        if (userDocSnapshot.exists()) {
+        setDisplayName(user.email); // set display name
+        const userDoc = db.collection("users").doc(user.uid);
+        const userDocSnapshot = await userDoc.get();
+        if (userDocSnapshot.exists) {
           const userData = userDocSnapshot.data();
           setBalance(userData.balance);
         }
       } else {
         setIsLoggedIn(false);
         setBalance(0);
+        setDisplayName(""); // clear display name
       }
     });
 
@@ -63,15 +80,23 @@ const TopNav = () => {
           </ul>
           {isLoggedIn ? (
             <div className="flex items-center">
-              <span className="mr-2">Balance: {balance}</span>
-              <button className="hidden md:block bg-green-500 text-black rounded-md p-2 w-32">
+              <span className="mr-16 text-white ">
+                {displayName ? `Welcome, ${displayName}!` : "none"}
+              </span>
+              <span className="mr-10 text-white">Balance: {balance}</span>
+              <button
+                className="hidden md:block bg-green-500 text-black rounded-md p-2 w-32"
+                onClick={handleSignOut}
+              >
                 Sign Out
               </button>
             </div>
           ) : (
-            <button className="hidden md:block bg-green-500 text-black rounded-md p-2 w-32">
-              Sign In
-            </button>
+            <Link href="/signup">
+              <button className="hidden md:block bg-green-500 text-black rounded-md p-2 w-32">
+                Sign In
+              </button>
+            </Link>
           )}
           <button className="md:hidden ml-4" onClick={toggleMobileMenu}>
             <GiHamburgerMenu size={24} />

@@ -2,11 +2,8 @@ import React, { useEffect } from "react";
 import { auth } from ".././firebase";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
-import {
-  GoogleAuthProvider,
-  EmailAuthProvider,
-  PhoneAuthProvider,
-} from "firebase/auth";
+import firebase from "firebase/app";
+import "firebase/auth";
 import { useRouter } from "next/router";
 
 const FirebaseAuth = () => {
@@ -16,18 +13,13 @@ const FirebaseAuth = () => {
       const uiConfig = {
         signInSuccessUrl: "/", // The URL to redirect to after a successful sign-in
         signInOptions: [
-          GoogleAuthProvider.PROVIDER_ID,
-          EmailAuthProvider.PROVIDER_ID,
-          PhoneAuthProvider.PROVIDER_ID,
+          // firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.EmailAuthProvider.PROVIDER_ID,
+          firebase.auth.PhoneAuthProvider.PROVIDER_ID,
         ],
         // Enable email link sign in (optional)
         signInFlow: "emailLink",
-        signInWithEmailLink: true,
-        callbacks: {
-          signInSuccessWithAuthResult: () => {
-            return false; // Avoid redirects after sign-in
-          },
-        },
+        credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
       };
 
       const ui =

@@ -1,22 +1,22 @@
 import React, { useEffect } from "react";
 import { auth, db } from ".././firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { collection, doc, setDoc } from "firebase/firestore";
+import "firebase/auth";
+import "firebase/firestore";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
-const SignUp = () => {
+export default function SignUp() {
   const router = useRouter();
 
   // Listen for user authentication state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user && user.metadata.creationTime === user.metadata.lastSignInTime) {
         // New user, set initial values
         const initialAmount = 1000;
-        const usersRef = collection(db, "users");
-        const userDoc = doc(usersRef, user.uid);
-        await setDoc(userDoc, {
+        const usersRef = db.collection("users");
+        const userDoc = usersRef.doc(user.uid);
+        await userDoc.set({
           email: user.email,
           balance: initialAmount,
           bets: [],
@@ -42,12 +42,16 @@ const SignUp = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign up for an account
           </h2>
+          <p className="mt-2 text-center text-gray-600">
+            New here? Don't worry! By signing up, you'll create an account.
+            Already have one? You'll be signed in automatically.
+          </p>
         </div>
         <DynamicFirebaseAuth />
       </div>
     </div>
   );
-};
+}
 
 // FirebaseAuth component
 const DynamicFirebaseAuth = dynamic(
@@ -56,5 +60,3 @@ const DynamicFirebaseAuth = dynamic(
     ssr: false,
   }
 );
-
-export default SignUp;
