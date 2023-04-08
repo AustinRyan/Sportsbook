@@ -1,13 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { auth, db } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 const TopNav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [balance, setBalance] = useState(0);
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        const userDoc = doc(db, "users", user.uid);
+        const userDocSnapshot = await getDoc(userDoc);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          setBalance(userData.balance);
+        }
+      } else {
+        setIsLoggedIn(false);
+        setBalance(0);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <section className="bg-primary h-20 w-screen">
@@ -25,7 +49,7 @@ const TopNav = () => {
               <a href="">Home</a>
             </li>
             <li className="mx-4">
-              <a href="">My Bets</a>
+              <a href="/mybets">My Bets</a>
             </li>
             <li className="mx-4">
               <a href="">Live In-Game</a>
@@ -37,9 +61,18 @@ const TopNav = () => {
               <a href="">How To Bet</a>
             </li>
           </ul>
-          <button className="hidden md:block bg-green-500 text-black rounded-md p-2 w-32">
-            Sign In
-          </button>
+          {isLoggedIn ? (
+            <div className="flex items-center">
+              <span className="mr-2">Balance: {balance}</span>
+              <button className="hidden md:block bg-green-500 text-black rounded-md p-2 w-32">
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <button className="hidden md:block bg-green-500 text-black rounded-md p-2 w-32">
+              Sign In
+            </button>
+          )}
           <button className="md:hidden ml-4" onClick={toggleMobileMenu}>
             <GiHamburgerMenu size={24} />
           </button>
