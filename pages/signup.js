@@ -43,8 +43,8 @@ export default function SignUp() {
             Sign up for an account
           </h2>
           <p className="mt-2 text-center text-gray-600">
-            New here? Don't worry! By signing up, you'll create an account.
-            Already have one? You'll be signed in automatically.
+            New here? Don&apos;t worry! By signing up, you&apos;ll create an
+            account. Already have one? You&apos;ll be signed in automatically.
           </p>
         </div>
         <DynamicFirebaseAuth />
