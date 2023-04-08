@@ -4,7 +4,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { auth, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, setDoc, getDoc } from "firebase/firestore";
-
+import { Link } from "next/link";
 const TopNav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -49,7 +49,7 @@ const TopNav = () => {
               <a href="">Home</a>
             </li>
             <li className="mx-4">
-              <a href="/mybets">My Bets</a>
+              <Link href="/mybets">My Bets</Link>
             </li>
             <li className="mx-4">
               <a href="">Live In-Game</a>
