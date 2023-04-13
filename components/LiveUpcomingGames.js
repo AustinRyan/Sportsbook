@@ -12,6 +12,8 @@ const LiveUpcomingGames = ({
   handleMoneylineSelection,
   handleOverUnderSelection,
 }) => {
+  // TODO: Move api into getServersideProps and pass in as props
+  // for better performance and SEO
   const options = {
     method: "GET",
     headers: {
