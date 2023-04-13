@@ -70,7 +70,7 @@ const TopNav = ({ balance, isLoggedIn, displayName }) => {
               </button>
             </Link>
           )}
-          <button className="md:hidden ml-4" onClick={toggleMobileMenu}>
+          <button className="md:hidden ml-4 z-10" onClick={toggleMobileMenu}>
             <GiHamburgerMenu size={24} />
           </button>
         </div>

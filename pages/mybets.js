@@ -98,7 +98,6 @@ const MyBets = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="bg-white p-6 mx-2 md:mx-auto w-full max-w-lg rounded-md shadow-lg z-20">
             {" "}
-            {/* Added z-20 */}
             <div className="text-center">
               <h3 className="text-2xl font-semibold mb-4">Game Processed</h3>
               <p className="mb-6">The game has been processed successfully.</p>

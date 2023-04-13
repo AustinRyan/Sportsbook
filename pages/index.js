@@ -12,14 +12,16 @@ import "firebase/firestore";
 import { AiOutlineRight, AiOutlineLeft } from "react-icons/ai";
 
 export default function Home() {
-  /*   TODO: 
-          Move all API calls into their respective getServersideProps functions
-          or getStaticProps functions.
-
+  /* 
+   TODO:
+          Move all API calls into their respective getServersideProps functions or getStaticProps functions.
           Doing this will improve performance and help with SEO.
-          Also, is considered best practice for Next.js apps
-  */
+           Also, is considered best practice for Next.js apps 
+           
 
+           
+          */
+  /* ---------------------------------------------------------------- */
   const [isPopularExpanded, setIsPopularExpanded] = useState(true);
   const togglePopularExpanded = () => {
     setIsPopularExpanded(!isPopularExpanded);
@@ -104,17 +106,6 @@ export default function Home() {
       amount: 0,
     };
 
-    // Check if the opposite moneyline is already in selectedBets
-    const oppositeMoneylineIndex = selectedBets.findIndex(
-      (b) =>
-        b.type === bet.type &&
-        b.team !== bet.team &&
-        b.homeTeam === bet.homeTeam &&
-        b.awayTeam === bet.awayTeam
-    );
-
-    // If the opposite moneyline is already in selectedBets, do nothing
-
     const betIndex = selectedBets.findIndex(
       (b) =>
         b.type === bet.type &&
@@ -190,7 +181,6 @@ export default function Home() {
 
     return true;
   };
-  // In the parent component
   const updateBetAmount = (index, amount) => {
     const updatedBets = [...selectedBets];
     updatedBets[index].amount = parseFloat(amount);
@@ -223,9 +213,7 @@ export default function Home() {
           handleSportToQuery={handleSportToQuery}
           className="hidden lg:block" // Hide SideNav on small screens
         />
-        {/* Main Content */}
         <div className="flex-grow  bg-black">
-          {/* Insert promo banners here */}
           <div className="bg-black h-1/4 p-1">
             <BannerCarousel />
           </div>
@@ -240,7 +228,6 @@ export default function Home() {
           </div>
         </div>
         <div className="bg-black lg:w-1/4 relative">
-          {/* Add arrow button for mobile devices */}
           <button
             className="absolute top-1/2 transform -translate-y-1/2 left-0 lg:hidden p-2 bg-black text-white z-10"
             onClick={() => setIsBetSlipExpanded(!isBetSlipExpanded)}
@@ -251,7 +238,6 @@ export default function Home() {
               <AiOutlineRight size={24} />
             )}
           </button>
-          {/* Show BetSlip on small screens when isBetSlipExpanded is true */}
           {(isBetSlipExpanded || !isMobile) && (
             <BetSlip
               selectedBets={selectedBets}
