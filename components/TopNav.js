@@ -6,11 +6,11 @@ import "firebase/auth";
 import "firebase/firestore";
 
 import Link from "next/link";
-const TopNav = () => {
+const TopNav = ({ balance, isLoggedIn, displayName }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [balance, setBalance] = useState(0);
-  const [displayName, setDisplayName] = useState("");
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [balance, setBalance] = useState();
+  // const [displayName, setDisplayName] = useState("");
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -27,38 +27,15 @@ const TopNav = () => {
     }
   };
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        setIsLoggedIn(true);
-        setDisplayName(user.email); // set display name
-        const userDoc = db.collection("users").doc(user.uid);
-        const userDocSnapshot = await userDoc.get();
-        if (userDocSnapshot.exists) {
-          const userData = userDocSnapshot.data();
-          setBalance(userData.balance);
-        }
-      } else {
-        setIsLoggedIn(false);
-        setBalance(0);
-        setDisplayName(""); // clear display name
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
   return (
     <section className="bg-primary h-20 w-screen">
       <div className=" mx-auto h-full flex items-center px-4">
         <Image
-          src="/vercel.svg"
+          src="/logo2.svg"
           width={100}
           height={100}
           alt="company logo"
-          className="w-28 h-20"
+          className="w-max h-28"
         />
         <div className="flex-grow flex items-center justify-between ml-4">
           <ul className="hidden md:flex text-lg text-gray-300">
@@ -66,16 +43,11 @@ const TopNav = () => {
               <a href="">Home</a>
             </li>
             <li className="mx-4">
-              <Link href="/mybets">My Bets</Link>
+              <Link href="/MyBets">My Bets</Link>
             </li>
+
             <li className="mx-4">
-              <a href="">Live In-Game</a>
-            </li>
-            <li className="mx-4">
-              <a href="">Promos</a>
-            </li>
-            <li className="mx-4">
-              <a href="">How To Bet</a>
+              <Link href="How-To-Bet">How To Bet</Link>
             </li>
           </ul>
           {isLoggedIn ? (

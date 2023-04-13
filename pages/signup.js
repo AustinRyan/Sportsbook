@@ -7,6 +7,13 @@ import { useRouter } from "next/router";
 
 export default function SignUp() {
   const router = useRouter();
+  // FirebaseAuth component
+  const DynamicFirebaseAuth = dynamic(
+    () => import("../components/FirebaseAuth"),
+    {
+      ssr: false,
+    }
+  );
 
   // Listen for user authentication state changes
   useEffect(() => {
@@ -16,11 +23,23 @@ export default function SignUp() {
         const initialAmount = 1000;
         const usersRef = db.collection("users");
         const userDoc = usersRef.doc(user.uid);
-        await userDoc.set({
-          email: user.email,
+        const initialUserData = {
           balance: initialAmount,
-          bets: [],
-        });
+          singlesPendingBets: [],
+          parlayPendingBets: [],
+          betsWon: [],
+          betsLost: [],
+        };
+
+        if (user.email) {
+          initialUserData.email = user.email;
+        }
+
+        if (user.phoneNumber) {
+          initialUserData.phone = user.phoneNumber;
+        }
+
+        await userDoc.set(initialUserData);
         console.log("User registered:", user);
         // After successful registration, redirect to another page or show a message
         router.push("/");
@@ -46,17 +65,14 @@ export default function SignUp() {
             New here? Don&apos;t worry! By signing up, you&apos;ll create an
             account. Already have one? You&apos;ll be signed in automatically.
           </p>
+          <p className="mt-2 text-center text-gray-600">
+            Demo Accounts: <br />
+            Email: demo@demo.com <br />
+            Password: demo123
+          </p>
         </div>
         <DynamicFirebaseAuth />
       </div>
     </div>
   );
 }
-
-// FirebaseAuth component
-const DynamicFirebaseAuth = dynamic(
-  () => import("../components/FirebaseAuth"),
-  {
-    ssr: false,
-  }
-);

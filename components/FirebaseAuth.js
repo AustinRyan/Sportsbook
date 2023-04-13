@@ -11,14 +11,13 @@ const FirebaseAuth = () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const uiConfig = {
-        signInSuccessUrl: "/", // The URL to redirect to after a successful sign-in
         signInOptions: [
           // firebase.auth.GoogleAuthProvider.PROVIDER_ID,
           firebase.auth.EmailAuthProvider.PROVIDER_ID,
           firebase.auth.PhoneAuthProvider.PROVIDER_ID,
         ],
-        // Enable email link sign in (optional)
-        signInFlow: "emailLink",
+        // Change the sign in flow to "redirect"
+        signInFlow: "popup",
         credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
       };
 

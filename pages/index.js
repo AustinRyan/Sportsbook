@@ -6,6 +6,9 @@ import BannerCarousel from "@/components/BannerCarousel";
 import LandingMainContent from "@/components/LandingMainContent";
 import ReferAFriend from "@/components/ReferAFriend";
 import BetSlip from "@/components/BetSlip";
+import { auth, db } from "../firebase";
+import "firebase/auth";
+import "firebase/firestore";
 
 export default function Home() {
   const [isPopularExpanded, setIsPopularExpanded] = useState(true);
@@ -32,17 +35,36 @@ export default function Home() {
     setSportToQuery(sport);
   };
 
-  const banners = [
-    "/banner1.jpg",
-    "/banner2.jpg",
-    "/banner3.jpg",
-    "/banner4.jpg",
-    "/banner5.jpg",
-    "/banner6.jpg",
-  ];
   const [selectedBets, setSelectedBets] = useState([]);
   const [isParlayValid, setIsParlayValid] = useState(true);
+  const [balance, setBalance] = useState();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [displayName, setDisplayName] = useState("");
 
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        console.log(user);
+        setIsLoggedIn(true);
+        setDisplayName(user.email); // set display name
+        const userDoc = db.collection("users").doc(user.uid);
+        const userDocSnapshot = await userDoc.get();
+        if (userDocSnapshot.exists) {
+          const userData = userDocSnapshot.data();
+          console.log(userData);
+          setBalance(userData.balance);
+        }
+      } else {
+        setIsLoggedIn(false);
+        setBalance(0);
+        setDisplayName(""); // clear display name
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
   const handleMoneylineSelection = (team, odds, homeTeam, awayTeam) => {
     const bet = {
       type: "moneyline",
@@ -50,6 +72,7 @@ export default function Home() {
       odds,
       homeTeam,
       awayTeam,
+      amount: 0,
     };
 
     // Check if the opposite moneyline is already in selectedBets
@@ -90,6 +113,7 @@ export default function Home() {
       outcome,
       homeTeam,
       awayTeam,
+      amount: 0,
     };
 
     const betIndex = selectedBets.findIndex(
@@ -137,6 +161,12 @@ export default function Home() {
 
     return true;
   };
+  // In the parent component
+  const updateBetAmount = (index, amount) => {
+    const updatedBets = [...selectedBets];
+    updatedBets[index].amount = parseFloat(amount);
+    setSelectedBets(updatedBets);
+  };
 
   useEffect(() => {
     setIsParlayValid(checkParlayValid(selectedBets));
@@ -150,7 +180,11 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <TopNav />
+      <TopNav
+        balance={balance}
+        displayName={displayName}
+        isLoggedIn={isLoggedIn}
+      />
       <div className="flex h-screen">
         <SideNav
           isPopularExpanded={isPopularExpanded}
@@ -163,7 +197,7 @@ export default function Home() {
         <div className="flex-grow  bg-black">
           {/* Insert promo banners here */}
           <div className="bg-black h-1/4 p-1">
-            <BannerCarousel banners={banners} />
+            <BannerCarousel />
           </div>
           <ReferAFriend />
           <div className=" ">
@@ -176,7 +210,13 @@ export default function Home() {
           </div>
         </div>
         <div className="bg-black w-1/4">
-          <BetSlip selectedBets={selectedBets} isParlayValid={isParlayValid} />
+          <BetSlip
+            selectedBets={selectedBets}
+            isParlayValid={isParlayValid}
+            updateBetAmount={updateBetAmount}
+            balance={balance}
+            setBalance={setBalance}
+          />
         </div>
       </div>
     </>

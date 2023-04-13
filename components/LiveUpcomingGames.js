@@ -34,18 +34,23 @@ const LiveUpcomingGames = ({
       options
     );
     const data = await response.json();
-    const scores = data.reduce((acc, game) => {
-      if (
-        game.home_team === homeTeam &&
-        game.away_team === awayTeam &&
-        game.scores &&
-        game.scores.length >= 2
-      ) {
-        acc[game.home_team] = game.scores[0].score;
-        acc[game.away_team] = game.scores[1].score;
-      }
-      return acc;
-    }, {});
+
+    console.log("API response:", data); // Log the response for debugging purposes
+
+    const scores = Array.isArray(data)
+      ? data.reduce((acc, game) => {
+          if (
+            game.home_team === homeTeam &&
+            game.away_team === awayTeam &&
+            game.scores &&
+            game.scores.length >= 2
+          ) {
+            acc[game.home_team] = game.scores[0].score;
+            acc[game.away_team] = game.scores[1].score;
+          }
+          return acc;
+        }, {})
+      : {};
 
     setLiveScores(scores);
   };

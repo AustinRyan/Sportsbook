@@ -20,15 +20,15 @@ const SideNav = ({
   };
   const getData = async () => {
     try {
-      // const cache = localStorage.getItem("titles");
-      // const cacheTimestamp = localStorage.getItem("titlesTimestamp");
-      // const currentTime = new Date().getTime();
-      // const fourHours = 4 * 60 * 60 * 1000;
+      const cache = localStorage.getItem("titles");
+      const cacheTimestamp = localStorage.getItem("titlesTimestamp");
+      const currentTime = new Date().getTime();
+      const fourHours = 4 * 60 * 60 * 1000;
 
-      // if (cache && cacheTimestamp && currentTime - cacheTimestamp < fourHours) {
-      //   setTitles(JSON.parse(cache));
-      //   return;
-      // }
+      if (cache && cacheTimestamp && currentTime - cacheTimestamp < fourHours) {
+        setTitles(JSON.parse(cache));
+        return;
+      }
 
       const response = await fetch(
         "https://odds.p.rapidapi.com/v4/sports?all=true",
@@ -68,8 +68,8 @@ const SideNav = ({
       console.log(groupedTitles);
       setTitles(groupedTitles);
 
-      // localStorage.setItem("titles", JSON.stringify(groupedTitles));
-      // localStorage.setItem("titlesTimestamp", currentTime);
+      localStorage.setItem("titles", JSON.stringify(groupedTitles));
+      localStorage.setItem("titlesTimestamp", currentTime);
     } catch (err) {
       console.error(err);
     }

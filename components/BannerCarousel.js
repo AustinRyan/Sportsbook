@@ -1,8 +1,16 @@
 import Image from "next/image";
 import React, { useState } from "react";
 
-const BannerCarousel = ({ banners }) => {
+const BannerCarousel = () => {
   const [current, setCurrent] = useState(0);
+  const banners = [
+    "/banner4.jpg",
+    "/banner2.jpg",
+    "/banner1.jpg",
+    "/banner1.jpg",
+    "/banner5.jpg",
+    "/banner6.jpg",
+  ];
 
   const handleNext = () => {
     setCurrent(current === banners.length - 3 ? 0 : current + 1);
