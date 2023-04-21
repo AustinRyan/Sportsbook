@@ -9,19 +9,16 @@ import BetSlip from "@/components/BetSlip";
 import { auth, db } from "../firebase";
 import "firebase/auth";
 import "firebase/firestore";
-import { AiOutlineRight, AiOutlineLeft } from "react-icons/ai";
 
 export default function Home() {
-  /* 
-   TODO:
-          Move all API calls into their respective getServersideProps functions or getStaticProps functions.
-          Doing this will improve performance and help with SEO.
-           Also, is considered best practice for Next.js apps 
-           
+  /*   TODO: 
+          Move all API calls into their respective getServersideProps functions
+          or getStaticProps functions.
 
-           
-          */
-  /* ---------------------------------------------------------------- */
+          Doing this will improve performance and help with SEO.
+          Also, is considered best practice for Next.js apps
+  */
+
   const [isPopularExpanded, setIsPopularExpanded] = useState(true);
   const togglePopularExpanded = () => {
     setIsPopularExpanded(!isPopularExpanded);
@@ -51,22 +48,6 @@ export default function Home() {
   const [balance, setBalance] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [displayName, setDisplayName] = useState("");
-  const [isMobileBetSlipOpen, setIsMobileBetSlipOpen] = useState(false);
-  const [isBetSlipExpanded, setIsBetSlipExpanded] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 1024);
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -92,10 +73,6 @@ export default function Home() {
       unsubscribe();
     };
   }, []);
-  const toggleMobileBetSlip = () => {
-    setIsMobileBetSlipOpen(!isMobileBetSlipOpen);
-  };
-
   const handleMoneylineSelection = (team, odds, homeTeam, awayTeam) => {
     const bet = {
       type: "moneyline",
@@ -105,6 +82,17 @@ export default function Home() {
       awayTeam,
       amount: 0,
     };
+
+    // Check if the opposite moneyline is already in selectedBets
+    const oppositeMoneylineIndex = selectedBets.findIndex(
+      (b) =>
+        b.type === bet.type &&
+        b.team !== bet.team &&
+        b.homeTeam === bet.homeTeam &&
+        b.awayTeam === bet.awayTeam
+    );
+
+    // If the opposite moneyline is already in selectedBets, do nothing
 
     const betIndex = selectedBets.findIndex(
       (b) =>
@@ -181,6 +169,7 @@ export default function Home() {
 
     return true;
   };
+  // In the parent component
   const updateBetAmount = (index, amount) => {
     const updatedBets = [...selectedBets];
     updatedBets[index].amount = parseFloat(amount);
@@ -204,21 +193,22 @@ export default function Home() {
         displayName={displayName}
         isLoggedIn={isLoggedIn}
       />
-      <div className="flex flex-col lg:flex-row h-screen">
+      <div className="flex h-screen">
         <SideNav
           isPopularExpanded={isPopularExpanded}
           togglePopularExpanded={togglePopularExpanded}
           isAllSportsExpanded={isAllSportsExpanded}
           toggleAllSportsExpanded={toggleAllSportsExpanded}
           handleSportToQuery={handleSportToQuery}
-          className="hidden lg:block" // Hide SideNav on small screens
         />
+        {/* Main Content */}
         <div className="flex-grow  bg-black">
+          {/* Insert promo banners here */}
           <div className="bg-black h-1/4 p-1">
             <BannerCarousel />
           </div>
           <ReferAFriend />
-          <div className=" ">
+          <div className=" max-h-screen ">
             <LandingMainContent
               sportToQuery={sportToQuery}
               isFuturesURL={isFuturesURL}
@@ -227,26 +217,14 @@ export default function Home() {
             />
           </div>
         </div>
-        <div className="bg-black lg:w-1/4 relative">
-          <button
-            className="absolute top-1/2 transform -translate-y-1/2 left-0 lg:hidden p-2 bg-black text-white z-10"
-            onClick={() => setIsBetSlipExpanded(!isBetSlipExpanded)}
-          >
-            {isBetSlipExpanded ? (
-              <AiOutlineLeft size={24} />
-            ) : (
-              <AiOutlineRight size={24} />
-            )}
-          </button>
-          {(isBetSlipExpanded || !isMobile) && (
-            <BetSlip
-              selectedBets={selectedBets}
-              isParlayValid={isParlayValid}
-              updateBetAmount={updateBetAmount}
-              balance={balance}
-              setBalance={setBalance}
-            />
-          )}
+        <div className="bg-black w-1/4">
+          <BetSlip
+            selectedBets={selectedBets}
+            isParlayValid={isParlayValid}
+            updateBetAmount={updateBetAmount}
+            balance={balance}
+            setBalance={setBalance}
+          />
         </div>
       </div>
     </>

@@ -43,7 +43,7 @@ const TopNav = ({ balance, isLoggedIn, displayName }) => {
               <a href="">Home</a>
             </li>
             <li className="mx-4">
-              <Link href="/MyBets">My Bets</Link>
+              <Link href="/mybets">My Bets</Link>
             </li>
 
             <li className="mx-4">
@@ -70,33 +70,36 @@ const TopNav = ({ balance, isLoggedIn, displayName }) => {
               </button>
             </Link>
           )}
-          <button className="md:hidden ml-4 z-10" onClick={toggleMobileMenu}>
+          <button className="md:hidden ml-4 " onClick={toggleMobileMenu}>
             <GiHamburgerMenu size={24} />
           </button>
         </div>
         {isMobileMenuOpen && (
-          <div className="absolute top-20 left-0 bg-slate-500 text-gray-300 text-lg w-full">
+          <div className="absolute top-20 left-0 bg-slate-500 text-gray-300 text-lg w-full z-10">
             {/* Add mobile menu items here */}
             <ul className="px-4 py-2">
               <li className="py-2">
-                <a href="">Home</a>
+                <Link href="">Home</Link>
               </li>
               <li className="py-2">
-                <a href="">My Bets</a>
+                <Link href="">My Bets</Link>
               </li>
               <li className="py-2">
-                <a href="">Live In-Game</a>
+                <Link href="">Live In-Game</Link>
               </li>
               <li className="py-2">
-                <a href="">Promos</a>
+                <Link href="">Promos</Link>
               </li>
               <li className="py-2">
-                <a href="">How To Bet</a>
+                <Link href="">How To Bet</Link>
               </li>
               <li className="py-2">
-                <button className="bg-green-500 text-black rounded-md p-2 w-32">
-                  Sign In
-                </button>
+                <Link href="/signup">
+                  Contact Us
+                  <button className="bg-green-500 text-black rounded-md p-2 w-32">
+                    Sign In
+                  </button>
+                </Link>
               </li>
             </ul>
           </div>

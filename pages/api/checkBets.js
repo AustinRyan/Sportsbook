@@ -10,10 +10,10 @@ const options = {
   },
 };
 // A function to fetch match results from an external API or other data source
-async function fetchMatchResults() {
+async function fetchMatchResults(sport) {
   // Fetch match results here and return them
   const response = await fetch(
-    `https://odds.p.rapidapi.com/v4/sports/baseball_mlb/scores?daysFrom=2`,
+    `https://odds.p.rapidapi.com/v4/sports/${sport}/scores?daysFrom=2`,
     options
   );
   const data = await response.json();
@@ -139,53 +139,72 @@ async function processParlayBets(matchResults) {
     }
   });
 }
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+async function processSingles(allMatchResults) {
+  const usersSnapshot = await db.collection("users").get();
+  usersSnapshot.forEach(async (userDoc) => {
+    const userRef = db.collection("users").doc(userDoc.id);
+    const user = userDoc.data();
+    const singlesPendingBets = user.singlesPendingBets || [];
 
-export default async function checkBets(req, res) {
-  try {
-    // Fetch match results
-    const matchResults = await fetchMatchResults();
-    console.log("Fetched match results:", matchResults);
+    for (const bet of singlesPendingBets) {
+      console.log("Processing single bet:", bet);
+      const isWinner = isBetWinner(bet, allMatchResults);
 
-    // Process single bets
-    console.log("Processing single bets...");
-    const usersSnapshot = await db.collection("users").get();
-    usersSnapshot.forEach(async (userDoc) => {
-      const userRef = db.collection("users").doc(userDoc.id);
-      const user = userDoc.data();
-      const singlesPendingBets = user.singlesPendingBets || [];
+      if (isWinner === null) {
+        console.log("This single bet is still pending! Bet data:", bet);
+        continue;
+      }
 
-      for (const bet of singlesPendingBets) {
-        console.log("Processing single bet:", bet);
-        const isWinner = isBetWinner(bet, matchResults);
-
-        if (isWinner === null) {
-          console.log("This single bet is still pending! Bet data:", bet);
-          continue;
-        }
-
-        if (isWinner) {
-          console.log("This single bet has won! Bet data:", bet);
-          const winnings = calculateWinnings(bet);
-          await updateUserBalance(userDoc.id, winnings);
-          await userRef.update({
-            betsWon: firebase.firestore.FieldValue.arrayUnion(bet),
-          });
-        } else {
-          console.log("This single bet has lost! Bet data:", bet);
-          await userRef.update({
-            betsLost: firebase.firestore.FieldValue.arrayUnion(bet),
-          });
-        }
-        // Remove the processed bet
+      if (isWinner) {
+        console.log("This single bet has won! Bet data:", bet);
+        const winnings = calculateWinnings(bet);
+        await updateUserBalance(userDoc.id, winnings);
         await userRef.update({
-          singlesPendingBets: firebase.firestore.FieldValue.arrayRemove(bet),
+          betsWon: firebase.firestore.FieldValue.arrayUnion(bet),
+        });
+      } else {
+        console.log("This single bet has lost! Bet data:", bet);
+        await userRef.update({
+          betsLost: firebase.firestore.FieldValue.arrayUnion(bet),
         });
       }
-    });
+      // Remove the processed bet
+      await userRef.update({
+        singlesPendingBets: firebase.firestore.FieldValue.arrayRemove(bet),
+      });
+    }
+  });
+}
+export default async function checkBets(req, res) {
+  try {
+    const sports = [
+      "baseball_mlb",
+      "basketball_nba",
+      "basketball_wnba",
+      "americanfootball_nfl",
+      "icehockey_nhl",
+      "soccer_usa_mls",
+    ];
+    const allMatchResults = [];
 
+    // Fetch match results
+    for (const sport of sports) {
+      const matchResults = await fetchMatchResults(sport);
+      allMatchResults.push(...matchResults);
+      await delay(1000);
+    }
+    console.log("Fetched match results:", allMatchResults);
+
+    /* Process single bets  */
+    console.log("Processing single bets...");
+    await processSingles(allMatchResults);
+
+    /* Process parlay bets  */
     console.log("Processing parlay bets...");
-
-    await processParlayBets(matchResults); // Assuming you have already updated processParlayBets function
+    await processParlayBets(allMatchResults);
 
     res.status(200).json({ message: "Bets processed successfully" });
   } catch (error) {

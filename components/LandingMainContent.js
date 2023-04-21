@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import LiveUpcomingGames from "./LiveUpcomingGames";
-
 const LandingMainContent = ({
   sportToQuery,
   handleMoneylineSelection,
@@ -137,12 +136,12 @@ const LandingMainContent = ({
   }, [sportToQuery]);
 
   return (
-    <div className="w-full">
-      <ul className="flex flex-wrap p-4 justify-evenly">
+    <div className="">
+      <ul className="flex p-4 justify-evenly ">
         <li
           className={`text-white cursor-pointer ${
             isGameLinesExpanded ? "border-b-2 border-green-500" : ""
-          } w-full md:w-auto text-center py-1`}
+          }`}
           onClick={() => {
             toggleGameLinesExpanded(isGameLinesExpanded);
           }}
@@ -152,7 +151,7 @@ const LandingMainContent = ({
         <li
           className={`text-white cursor-pointer ${
             isLiveInGameExpanded ? "border-b-2 border-green-500" : ""
-          } w-full md:w-auto text-center py-1`}
+          }`}
           onClick={() => {
             toggleLiveInGameExpanded(isLiveInGameExpanded);
           }}
