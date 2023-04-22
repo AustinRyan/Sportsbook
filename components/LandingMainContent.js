@@ -217,7 +217,7 @@ const LandingMainContent = ({
       )}
       {isGameLinesExpanded && (
         <>
-          <div className="max-h-[calc(100vh-380px)] overflow-y-auto">
+          <div className="max-h-[calc(100vh-340px)] overflow-y-auto">
             {liveGames.map((game, index) => {
               const utcDate = new Date(game.commence_time * 1000);
               const estDate = new Date(

@@ -49,6 +49,24 @@ const BetSlip = ({
       setModalMessage("Bet placed successfully.");
       setSuccess(true);
       setBalance((prevBalance) => prevBalance - betAmount); // Update the balance using setBalance
+
+      // Send an SMS with the bet information
+      const betInfo = `Bet Type: ${betType}, Selected Bets: ${JSON.stringify(
+        selectedBets
+      )}, Bet Amount: ${betAmount}`;
+
+      // Call the API route to send the SMS
+      const response = await fetch("/api/sendBetNotification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ betInfo }),
+      });
+
+      if (response.ok) {
+        console.log("SMS sent successfully");
+      } else {
+        console.error("Error sending SMS");
+      }
     } catch (error) {
       console.error("Error placing bet:", error);
       setModalMessage("Something went wrong when placing your bet. Try again.");

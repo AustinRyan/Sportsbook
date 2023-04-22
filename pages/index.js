@@ -208,7 +208,7 @@ export default function Home() {
             <BannerCarousel />
           </div>
           <ReferAFriend />
-          <div className=" max-h-screen ">
+          <div className=" max-h-screen overflow-y-auto">
             <LandingMainContent
               sportToQuery={sportToQuery}
               isFuturesURL={isFuturesURL}
